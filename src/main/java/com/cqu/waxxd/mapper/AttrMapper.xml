@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cqu.waxxd.mapper.AttrMapper">
+	<resultMap type="com.cqu.waxxd.bean.OBJECT_T_MALL_ATTR" id="select_attr_listMap" autoMapping="true">
+		<result column="attr_id" property="id"/>
+		<collection property="list_value" ofType="com.cqu.waxxd.bean.T_MALL_VALUE"
+				autoMapping="true">
+				<result column="val_id" property="id"/>
+		</collection>
+	</resultMap>
+	
+	<select id="select_attr_list" resultMap="select_attr_listMap" parameterType="int">
+		select attr.id attr_id,attr.*,val.id val_id,val.* 
+		from t_mall_attr attr,t_mall_value val
+		where attr.id = val.shxm_id
+		and attr.flbh2 = #{flbh2}
+	</select>
+	
+	<insert id="insert_attr">
+		insert into 
+			t_mall_attr
+				(shxm_mch,flbh2)
+		values
+			(#{attr.shxm_mch},#{flbh2})
+		<selectKey resultType="int" keyProperty="attr.id" order="AFTER">
+			select @@identity
+		</selectKey>
+	</insert>
+	
+	<insert id="insert_values">
+		insert into t_mall_value(shxzh,shxm_id,shxzh_mch)
+		values
+		<foreach collection="list_value" item="val" separator=",">
+			(#{val.shxzh},#{attr_id},#{val.shxzh_mch})
+		</foreach>
+	</insert>
+	
+</mapper>
